@@ -9,9 +9,13 @@ import InputOption from './InputOption'
 import Post from './Post'
 import firebase from 'firebase/compat/app';
 import { db } from './firebase'
+import { useSelector } from 'react-redux'
+import { selectUser } from './features/userSlice'
+import FlipMove from 'react-flip-move'
 
 
 const Feed = () => {
+    const user = useSelector(selectUser)
 
     const [input, setInput] = useState("");
 
@@ -33,10 +37,10 @@ const Feed = () => {
         e.preventDefault();
 
         db.collection('posts').add({
-            name: 'Luis Rua',
-            description: 'This is A test',
+            name: user.displayName,
+            description: user.email,
             message: input,
-            photoUrl: "",
+            photoUrl: user.photoUrl || "",
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         });
 
@@ -50,7 +54,7 @@ const Feed = () => {
                 <div className="feed__input">
                     <CreateIcon />
                     <form>
-                        <input value={input} onChange={
+                        <input placeholder='Type a message and press enter!' value={input} onChange={
                             e => setInput(e.target.value)
                         } type="text" />
                         <button onClick={sendPost} type="submit">Send</button>
@@ -64,7 +68,7 @@ const Feed = () => {
                         color="#7FC15E" />
                 </div>
             </div>
-
+            <FlipMove>
             {posts.map(({ id, data: { name, description, message, photoUrl } }) => (
                 <Post
                     key={id}
@@ -74,11 +78,13 @@ const Feed = () => {
                     photoUrl={photoUrl}
                 />
             ))}
+            </FlipMove>
             <Post
                 name="Luis Rua"
                 description="This is a test"
                 message="First message, hello world post linked in react clone" />
         </div>
+        
     )
 }
 
